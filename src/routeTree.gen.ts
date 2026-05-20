@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RacesRouteImport } from './routes/races'
 import { Route as FormationRouteImport } from './routes/formation'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommandeRouteImport } from './routes/commande'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,6 +30,11 @@ const RacesRoute = RacesRouteImport.update({
 const FormationRoute = FormationRouteImport.update({
   id: '/formation',
   path: '/formation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/commande': typeof CommandeRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/formation': typeof FormationRoute
   '/races': typeof RacesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/commande': typeof CommandeRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/formation': typeof FormationRoute
   '/races': typeof RacesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/commande': typeof CommandeRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/formation': typeof FormationRoute
   '/races': typeof RacesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -78,16 +87,25 @@ export interface FileRouteTypes {
     | '/'
     | '/commande'
     | '/contact'
+    | '/faq'
     | '/formation'
     | '/races'
     | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/commande' | '/contact' | '/formation' | '/races' | '/sitemap.xml'
+  to:
+    | '/'
+    | '/commande'
+    | '/contact'
+    | '/faq'
+    | '/formation'
+    | '/races'
+    | '/sitemap.xml'
   id:
     | '__root__'
     | '/'
     | '/commande'
     | '/contact'
+    | '/faq'
     | '/formation'
     | '/races'
     | '/sitemap.xml'
@@ -97,6 +115,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CommandeRoute: typeof CommandeRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   FormationRoute: typeof FormationRoute
   RacesRoute: typeof RacesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -123,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/formation'
       fullPath: '/formation'
       preLoaderRoute: typeof FormationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -153,6 +179,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CommandeRoute: CommandeRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   FormationRoute: FormationRoute,
   RacesRoute: RacesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

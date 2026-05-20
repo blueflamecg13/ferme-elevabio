@@ -79,6 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { httpEquiv: "X-Frame-Options", content: "SAMEORIGIN" },
       { httpEquiv: "Permissions-Policy", content: "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
       { httpEquiv: "Strict-Transport-Security", content: "max-age=63072000; includeSubDomains; preload" },
+      { httpEquiv: "Content-Security-Policy", content: "default-src 'self'; base-uri 'self'; object-cast 'none'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https:; form-action 'self' https://wa.me; manifest-src 'self'; upgrade-insecure-requests" },
       { title: "Elevabio — Ferme Avicole Goliath & Brahma | Pointe-Noire" },
       { name: "description", content: "Elevabio, ferme avicole spécialisée Goliath et Brahma à Pointe-Noire, Congo. Œufs fertiles, poussins, reproducteurs et formations." },
       { property: "og:type", content: "website" },
