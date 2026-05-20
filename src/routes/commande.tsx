@@ -114,6 +114,17 @@ function Order() {
         )}
 
         <form onSubmit={handleSubmit} noValidate className="mt-8 bg-card rounded-3xl shadow-card p-6 sm:p-8 space-y-5">
+          {/* Honeypot anti-spam : champ invisible pour les humains */}
+          <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+            <label>Site web (laisser vide)
+              <input type="text" tabIndex={-1} autoComplete="off" value={data.website} onChange={(e) => update("website", e.target.value)} />
+            </label>
+          </div>
+
+          {errors.form && (
+            <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-xl px-4 py-3 text-sm">{errors.form}</div>
+          )}
+
           <Field label="Nom complet *" error={errors.name}>
             <input type="text" required maxLength={80} autoComplete="name" value={data.name} onChange={(e) => update("name", e.target.value)} className="form-input" />
           </Field>
