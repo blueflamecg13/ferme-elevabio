@@ -41,7 +41,9 @@ function Order() {
   const [data, setData] = useState({
     name: "", phone: "", email: "",
     product: "oeufs", breed: "Goliath", quantity: 10, message: "",
+    website: "", // honeypot
   });
+  const [mountedAt] = useState(() => Date.now());
 
   function update<K extends keyof typeof data>(k: K, v: (typeof data)[K]) {
     setData((d) => ({ ...d, [k]: v }));
@@ -49,6 +51,18 @@ function Order() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Anti-spam : honeypot
+    if (data.website.trim() !== "") {
+      setErrors({ form: "Erreur de validation." });
+      return;
+    }
+    // Anti-spam : soumission trop rapide (< 3s = bot)
+    if (Date.now() - mountedAt < 3000) {
+      setErrors({ form: "Merci de prendre quelques instants pour remplir le formulaire." });
+      return;
+    }
+
     const result = schema.safeParse(data);
     if (!result.success) {
       const errs: Record<string, string> = {};
@@ -59,16 +73,25 @@ function Order() {
       return;
     }
     setErrors({});
-    const productLabel = productOptions.find((p) => p.id === result.data.product)?.label;
-    const text =
-      `Bonjour Elevabio,%0A%0AJe souhaite commander :%0A` +
-      `• Produit : ${encodeURIComponent(productLabel ?? "")}%0A` +
-      `• Race : ${encodeURIComponent(result.data.breed)}%0A` +
-      `• Quantité : ${result.data.quantity}%0A%0A` +
-      `Nom : ${encodeURIComponent(result.data.name)}%0A` +
-      `Téléphone : ${encodeURIComponent(result.data.phone)}%0A` +
-      (result.data.email ? `Email : ${encodeURIComponent(result.data.email)}%0A` : "") +
-      (result.data.message ? `%0AMessage : ${encodeURIComponent(result.data.message)}` : "");
+    const productLabel = productOptions.find((p) => p.id === result.data.product)?.label ?? "";
+    const lines = [
+      "🐔 *Nouvelle commande — Elevabio*",
+      "",
+      "*Récapitulatif*",
+      `• Produit : ${productLabel}`,
+      `• Race : ${result.data.breed}`,
+      `• Quantité : ${result.data.quantity}`,
+      "",
+      "*Coordonnées client*",
+      `• Nom : ${result.data.name}`,
+      `• Téléphone : ${result.data.phone}`,
+    ];
+    if (result.data.email) lines.push(`• Email : ${result.data.email}`);
+    if (result.data.message) {
+      lines.push("", "*Message*", result.data.message);
+    }
+    lines.push("", "Merci de me confirmer la disponibilité, le prix et le délai. 🙏");
+    const text = encodeURIComponent(lines.join("\n"));
     window.open(`https://wa.me/242068172503?text=${text}`, "_blank", "noopener,noreferrer");
     setSent(true);
   }
@@ -91,6 +114,17 @@ function Order() {
         )}
 
         <form onSubmit={handleSubmit} noValidate className="mt-8 bg-card rounded-3xl shadow-card p-6 sm:p-8 space-y-5">
+          {/* Honeypot anti-spam : champ invisible pour les humains */}
+          <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+            <label>Site web (laisser vide)
+              <input type="text" tabIndex={-1} autoComplete="off" value={data.website} onChange={(e) => update("website", e.target.value)} />
+            </label>
+          </div>
+
+          {errors.form && (
+            <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-xl px-4 py-3 text-sm">{errors.form}</div>
+          )}
+
           <Field label="Nom complet *" error={errors.name}>
             <input type="text" required maxLength={80} autoComplete="name" value={data.name} onChange={(e) => update("name", e.target.value)} className="form-input" />
           </Field>
