@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RacesRouteImport } from './routes/races'
+import { Route as FormationRouteImport } from './routes/formation'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CommandeRouteImport } from './routes/commande'
 import { Route as IndexRouteImport } from './routes/index'
 
+const RacesRoute = RacesRouteImport.update({
+  id: '/races',
+  path: '/races',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FormationRoute = FormationRouteImport.update({
+  id: '/formation',
+  path: '/formation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommandeRoute = CommandeRouteImport.update({
+  id: '/commande',
+  path: '/commande',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,72 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/commande': typeof CommandeRoute
+  '/contact': typeof ContactRoute
+  '/formation': typeof FormationRoute
+  '/races': typeof RacesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/commande': typeof CommandeRoute
+  '/contact': typeof ContactRoute
+  '/formation': typeof FormationRoute
+  '/races': typeof RacesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/commande': typeof CommandeRoute
+  '/contact': typeof ContactRoute
+  '/formation': typeof FormationRoute
+  '/races': typeof RacesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/commande' | '/contact' | '/formation' | '/races'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/commande' | '/contact' | '/formation' | '/races'
+  id: '__root__' | '/' | '/commande' | '/contact' | '/formation' | '/races'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommandeRoute: typeof CommandeRoute
+  ContactRoute: typeof ContactRoute
+  FormationRoute: typeof FormationRoute
+  RacesRoute: typeof RacesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/races': {
+      id: '/races'
+      path: '/races'
+      fullPath: '/races'
+      preLoaderRoute: typeof RacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formation': {
+      id: '/formation'
+      path: '/formation'
+      fullPath: '/formation'
+      preLoaderRoute: typeof FormationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/commande': {
+      id: '/commande'
+      path: '/commande'
+      fullPath: '/commande'
+      preLoaderRoute: typeof CommandeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +121,21 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommandeRoute: CommandeRoute,
+  ContactRoute: ContactRoute,
+  FormationRoute: FormationRoute,
+  RacesRoute: RacesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
