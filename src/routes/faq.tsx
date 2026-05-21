@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import { useState } from "react";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronDown, HelpCircle, Search, X } from "lucide-react";
+
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -74,7 +75,32 @@ function Item({ qa }: { qa: QA }) {
   );
 }
 
+const TAGS = ["Tous", "Élevage", "Biosécurité", "Commandes", "Formations"] as const;
+
+function normalize(s: string) {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function FaqPage() {
+  const [query, setQuery] = useState("");
+  const [tag, setTag] = useState<(typeof TAGS)[number]>("Tous");
+
+  const filteredSections = useMemo(() => {
+    const q = normalize(query.trim());
+    return sections
+      .filter((s) => {
+        if (tag === "Tous") return true;
+        return normalize(s.title).includes(normalize(tag));
+      })
+      .map((s) => ({
+        ...s,
+        items: s.items.filter(
+          (qa) => !q || normalize(qa.q).includes(q) || normalize(qa.a).includes(q),
+        ),
+      }))
+      .filter((s) => s.items.length > 0);
+  }, [query, tag]);
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -96,18 +122,66 @@ function FaqPage() {
           Tout ce qu'il faut savoir sur l'élevage Goliath & Brahma, la biosécurité, nos délais de commande et nos formations.
         </p>
 
-        <div className="mt-10 space-y-8">
-          {sections.map((s) => (
-            <div key={s.title} className="bg-card rounded-3xl shadow-card p-6 sm:p-8">
-              <div className="flex items-center gap-3 mb-2">
-                <HelpCircle className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-display font-bold text-primary">{s.title}</h2>
-              </div>
-              <div>
-                {s.items.map((qa) => <Item key={qa.q} qa={qa} />)}
-              </div>
+        {/* Recherche + filtres */}
+        <div className="mt-8 space-y-4">
+          <div className="relative">
+            <Search className="w-5 h-5 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rechercher : biosécurité, délais, formation, vaccin..."
+              className="w-full bg-card border border-border rounded-2xl pl-12 pr-12 py-3.5 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              aria-label="Rechercher dans la FAQ"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="Effacer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full hover:bg-secondary"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {TAGS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTag(t)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition border ${
+                  tag === t
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-foreground border-border hover:border-primary"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 space-y-8">
+          {filteredSections.length === 0 ? (
+            <div className="bg-card rounded-3xl shadow-card p-10 text-center">
+              <p className="text-muted-foreground">Aucun résultat pour <span className="font-semibold text-foreground">"{query}"</span>.</p>
+              <button type="button" onClick={() => { setQuery(""); setTag("Tous"); }} className="mt-4 text-primary font-semibold underline">Réinitialiser</button>
             </div>
-          ))}
+          ) : (
+            filteredSections.map((s) => (
+              <div key={s.title} className="bg-card rounded-3xl shadow-card p-6 sm:p-8">
+                <div className="flex items-center gap-3 mb-2">
+                  <HelpCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-display font-bold text-primary">{s.title}</h2>
+                </div>
+                <div>
+                  {s.items.map((qa) => <Item key={qa.q} qa={qa} />)}
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="mt-12 text-center bg-primary/5 border border-primary/20 rounded-3xl p-8">
@@ -124,3 +198,4 @@ function FaqPage() {
     </Layout>
   );
 }
+
