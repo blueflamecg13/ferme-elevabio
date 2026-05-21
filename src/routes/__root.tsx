@@ -123,11 +123,28 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+const swRegisterScript = `(function(){
+  try {
+    var inIframe = false;
+    try { inIframe = window.self !== window.top; } catch(e) { inIframe = true; }
+    var host = window.location.hostname;
+    var isPreview = host.indexOf('id-preview--') !== -1 || host.indexOf('lovableproject.com') !== -1;
+    if ('serviceWorker' in navigator && !inIframe && !isPreview) {
+      window.addEventListener('load', function(){
+        navigator.serviceWorker.register('/sw.js').catch(function(){});
+      });
+    } else if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); }).catch(function(){});
+    }
+  } catch(e){}
+})();`;
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
+      <script dangerouslySetInnerHTML={{ __html: swRegisterScript }} />
       <Outlet />
     </QueryClientProvider>
   );
