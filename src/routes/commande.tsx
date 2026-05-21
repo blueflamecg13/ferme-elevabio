@@ -25,15 +25,53 @@ const productOptions = [
 
 const breedOptions = ["Goliath", "Brahma", "Les deux"] as const;
 
+// Téléphone international strict : +<indicatif 1-3><chiffres 6-12>, espaces tolérés à la saisie
+// Accepte aussi format local Congo commençant par 0 (puis 8 ou 9 chiffres).
+const phoneRegex = /^(\+\d{7,15}|0\d{8,9})$/;
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const schema = z.object({
   name: z.string().trim().min(2, "Nom trop court").max(80, "Nom trop long").regex(/^[\p{L}\s'-]+$/u, "Caractères invalides"),
-  phone: z.string().trim().min(7, "Téléphone invalide").max(20).regex(/^[+\d\s().-]+$/, "Téléphone invalide"),
-  email: z.string().trim().email("Email invalide").max(120).optional().or(z.literal("")),
+  phone: z.string()
+    .trim()
+    .transform((v) => v.replace(/[\s().-]/g, ""))
+    .pipe(z.string().regex(phoneRegex, "Numéro invalide. Format : +242 06 817 25 03 ou 06 817 25 03")),
+  email: z.string().trim().max(120).regex(emailRegex, "Format email invalide").optional().or(z.literal("")),
   product: z.enum(productOptions.map((p) => p.id) as [string, ...string[]]),
   breed: z.enum(breedOptions),
   quantity: z.coerce.number().int().min(1, "Min. 1").max(10000, "Quantité trop élevée"),
   message: z.string().trim().max(800, "Message trop long").optional().or(z.literal("")),
 });
+
+// Limitation côté client (anti-spam) : max 3 envois / 10 min, sinon blocage 15 min.
+const RL_KEY = "elevabio_order_rl";
+const RL_WINDOW = 10 * 60 * 1000;
+const RL_MAX = 3;
+const RL_BLOCK = 15 * 60 * 1000;
+
+function checkRateLimit(): { ok: true } | { ok: false; retryInSec: number } {
+  if (typeof window === "undefined") return { ok: true };
+  try {
+    const now = Date.now();
+    const raw = localStorage.getItem(RL_KEY);
+    const state: { hits: number[]; blockUntil?: number } = raw ? JSON.parse(raw) : { hits: [] };
+    if (state.blockUntil && state.blockUntil > now) {
+      return { ok: false, retryInSec: Math.ceil((state.blockUntil - now) / 1000) };
+    }
+    state.hits = (state.hits || []).filter((t) => now - t < RL_WINDOW);
+    if (state.hits.length >= RL_MAX) {
+      state.blockUntil = now + RL_BLOCK;
+      localStorage.setItem(RL_KEY, JSON.stringify(state));
+      return { ok: false, retryInSec: Math.ceil(RL_BLOCK / 1000) };
+    }
+    state.hits.push(now);
+    delete state.blockUntil;
+    localStorage.setItem(RL_KEY, JSON.stringify(state));
+    return { ok: true };
+  } catch {
+    return { ok: true };
+  }
+}
 
 function Order() {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -52,12 +90,10 @@ function Order() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // Anti-spam : honeypot
     if (data.website.trim() !== "") {
       setErrors({ form: "Erreur de validation." });
       return;
     }
-    // Anti-spam : soumission trop rapide (< 3s = bot)
     if (Date.now() - mountedAt < 3000) {
       setErrors({ form: "Merci de prendre quelques instants pour remplir le formulaire." });
       return;
@@ -72,6 +108,14 @@ function Order() {
       setErrors(errs);
       return;
     }
+
+    const rl = checkRateLimit();
+    if (!rl.ok) {
+      const min = Math.ceil(rl.retryInSec / 60);
+      setErrors({ form: `Trop de tentatives. Réessayez dans ~${min} min, ou appelez-nous directement.` });
+      return;
+    }
+
     setErrors({});
     const productLabel = productOptions.find((p) => p.id === result.data.product)?.label ?? "";
     const lines = [
@@ -95,6 +139,7 @@ function Order() {
     window.open(`https://wa.me/242068172503?text=${text}`, "_blank", "noopener,noreferrer");
     setSent(true);
   }
+
 
   return (
     <Layout>
