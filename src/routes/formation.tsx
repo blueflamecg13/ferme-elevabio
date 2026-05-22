@@ -41,7 +41,7 @@ function FormationPage() {
           </ul>
 
           <div style={{ textAlign: "center", marginTop: 40 }}>
-            <Link to="/commande" search={{ produit: "Formation" } as never} className="btn btn-lime">S'inscrire à une formation</Link>
+            <Link to="/commande" className="btn btn-lime">S'inscrire à une formation</Link>
           </div>
 
           <div className="cta-banner">
