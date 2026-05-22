@@ -1,63 +1,66 @@
-import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
-import logo from "@/assets/logo.jpg";
+import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 
-const links = [
-  { to: "/", label: "Accueil" },
-  { to: "/races", label: "Nos Races" },
-  { to: "/commande", label: "Commander" },
-  { to: "/formation", label: "Formation" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/contact", label: "Contact" },
+const NAV = [
+  { to: "/", label: "Accueil", id: "index" },
+  { to: "/races", label: "Nos Races", id: "races" },
+  { to: "/commande", label: "Commander", id: "commande" },
+  { to: "/formation", label: "Formation", id: "formation" },
+  { to: "/faq", label: "FAQ", id: "faq" },
+  { to: "/contact", label: "Contact", id: "contact" },
 ] as const;
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { location } = useRouterState();
+
+  useEffect(() => {
+    document.body.classList.toggle("nav-open", open);
+    return () => document.body.classList.remove("nav-open");
+  }, [open]);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  const currentId =
+    NAV.find((n) => n.to === location.pathname)?.id ?? "index";
+
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-background/85 border-b border-border">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Elevabio Ferme Avicole" className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" width={44} height={44} />
-          <div className="leading-tight">
-            <div className="font-display font-bold text-lg text-primary">Elevabio</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Ferme Avicole</div>
+    <header className="site-header site-header--solid" id="site-header">
+      <div className="container header-inner">
+        <Link to="/" className="logo-wrapper">
+          <img src="/img/logo-elevabio.jpg" alt="Logo ElevaBio" className="site-logo" width={52} height={52} />
+          <div className="logo-text">
+            <span className="logo-brand">ElevaBio</span>
+            <span className="logo-tag">Ferme avicole</span>
           </div>
         </Link>
-        <nav className="hidden md:flex items-center gap-1">
-          {links.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="px-3.5 py-2 rounded-full text-sm font-medium text-foreground/80 hover:text-primary hover:bg-secondary transition-colors"
-              activeProps={{ className: "px-3.5 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground" }}
-              activeOptions={{ exact: true }}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-        <Link to="/commande" className="hidden md:inline-flex items-center rounded-full bg-accent text-accent-foreground px-5 py-2.5 text-sm font-semibold hover:brightness-95 transition">
-          Commander
-        </Link>
-        <button aria-label="Menu" className="md:hidden p-2 rounded-md hover:bg-secondary" onClick={() => setOpen(!open)}>
-          {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-controls="site-nav"
+          aria-expanded={open}
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <span className="nav-toggle-bar" />
+          <span className="nav-toggle-bar" />
+          <span className="nav-toggle-bar" />
         </button>
-      </div>
-      {open && (
-        <div className="md:hidden border-t border-border bg-background">
-          <div className="px-4 py-3 flex flex-col gap-1">
-            {links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary">
-                {l.label}
+        <div className="site-nav" id="site-nav">
+          <nav className="nav-main" aria-label="Navigation principale">
+            {NAV.map((n) => (
+              <Link key={n.id} to={n.to} className={currentId === n.id ? "active" : ""}>
+                {n.label}
               </Link>
             ))}
-            <Link to="/commande" onClick={() => setOpen(false)} className="mt-2 text-center rounded-full bg-accent text-accent-foreground px-5 py-2.5 text-sm font-semibold">
-              Commander
-            </Link>
+          </nav>
+          <div className="header-actions">
+            <Link to="/commande" className="btn btn-lime">Commander</Link>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

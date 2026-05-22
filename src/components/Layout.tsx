@@ -3,10 +3,10 @@ import { SiteFooter } from "./SiteFooter";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main>{children}</main>
       <SiteFooter />
-    </div>
+    </>
   );
 }
