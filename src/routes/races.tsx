@@ -1,56 +1,67 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import goliathImg from "@/assets/goliath.jpg";
-import brahmaImg from "@/assets/hero-brahma.jpg";
 
 export const Route = createFileRoute("/races")({
   head: () => ({
     meta: [
-      { title: "Nos Races Goliath et Brahma | Elevabio" },
-      { name: "description", content: "Découvrez les races Goliath et Brahma élevées par Elevabio à Pointe-Noire : caractéristiques, atouts et conseils d'élevage." },
-      { property: "og:title", content: "Races Goliath & Brahma — Elevabio" },
-      { property: "og:description", content: "Caractéristiques et atouts des races Goliath et Brahma." },
+      { title: "Nos Races — Goliath & Brahma | ElevaBio" },
+      { name: "description", content: "Découvrez les races Goliath et Brahma élevées par ElevaBio à Pointe-Noire." },
     ],
   }),
-  component: Races,
+  component: RacesPage,
 });
 
-function Races() {
+function RacesPage() {
   return (
     <Layout>
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-primary">Nos Races</h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl">Elevabio se concentre exclusivement sur deux races d'exception : Goliath et Brahma.</p>
+      <section className="page-hero" style={{ marginTop: 24 }}>
+        <span className="eyebrow">Nos Races</span>
+        <h1>Goliath & Brahma</h1>
+        <p>Deux races d'exception sélectionnées pour leur taille, leur robustesse et leur rendement remarquable.</p>
+      </section>
 
-        <article className="mt-12 grid md:grid-cols-2 gap-8 items-center">
-          <img src={goliathImg} alt="Race Goliath" className="rounded-3xl shadow-card w-full" />
-          <div>
-            <h2 className="text-3xl font-display font-bold text-foreground">Goliath</h2>
-            <p className="mt-3 text-muted-foreground">Considérée comme la plus grande race de poule au monde, originaire de la République Démocratique du Congo. Le Goliath impressionne par sa taille et sa robustesse.</p>
-            <ul className="mt-5 space-y-2 text-foreground/80">
-              <li><b>Poids :</b> jusqu'à 7 kg pour le coq, 5 kg pour la poule.</li>
-              <li><b>Production :</b> excellente viande, fibres tendres.</li>
-              <li><b>Rusticité :</b> très adaptée au climat tropical du Congo.</li>
-              <li><b>Ponte :</b> 80 à 120 œufs/an, gros calibre.</li>
-            </ul>
-          </div>
-        </article>
+      <section className="inner-page">
+        <div className="container">
+          <article className="race-card" id="goliath" style={{ marginBottom: 40 }}>
+            <div className="race-grid" style={{ gridTemplateColumns: "1fr 1.2fr", alignItems: "center" }}>
+              <img src="/img/goliath.jpg" alt="Poulet Goliath" style={{ borderRadius: "var(--radius-lg)", height: "100%", minHeight: 320, objectFit: "cover" }} />
+              <div className="race-card-body" style={{ background: "var(--cream)", borderRadius: "var(--radius-lg)" }}>
+                <h2>Goliath</h2>
+                <p>Considérée comme la plus grande race de poule au monde, originaire de la République Démocratique du Congo. Le Goliath impressionne par sa taille et sa robustesse.</p>
+                <ul>
+                  <li><strong>Poids :</strong> jusqu'à 7 kg pour le coq, 5 kg pour la poule.</li>
+                  <li><strong>Production :</strong> excellente viande, fibres tendres.</li>
+                  <li><strong>Rusticité :</strong> très adaptée au climat tropical du Congo.</li>
+                  <li><strong>Ponte :</strong> 80 à 120 œufs/an, gros calibre.</li>
+                </ul>
+                <Link to="/commande" className="btn btn-lime" style={{ marginTop: 20 }}>Commander</Link>
+              </div>
+            </div>
+          </article>
 
-        <article className="mt-16 grid md:grid-cols-2 gap-8 items-center">
-          <div className="md:order-2">
-            <img src={brahmaImg} alt="Race Brahma" className="rounded-3xl shadow-card w-full" />
+          <article className="race-card" id="brahma">
+            <div className="race-grid" style={{ gridTemplateColumns: "1.2fr 1fr", alignItems: "center" }}>
+              <div className="race-card-body" style={{ background: "var(--cream)", borderRadius: "var(--radius-lg)" }}>
+                <h2>Brahma</h2>
+                <p>Race majestueuse dite « roi des poulets ». Plumage soyeux, tempérament docile, idéale pour la reproduction et l'ornement.</p>
+                <ul>
+                  <li><strong>Poids adulte :</strong> 5 à 6 kg</li>
+                  <li><strong>Pattes emplumées</strong> caractéristiques</li>
+                  <li><strong>Ponte régulière</strong> en hiver</li>
+                  <li>Excellente race pour la reproduction et l'élevage familial</li>
+                </ul>
+                <Link to="/commande" className="btn btn-lime" style={{ marginTop: 20 }}>Commander</Link>
+              </div>
+              <img src="/img/brahma.jpg" alt="Brahma" style={{ borderRadius: "var(--radius-lg)", height: "100%", minHeight: 320, objectFit: "cover" }} />
+            </div>
+          </article>
+
+          <div className="cta-banner">
+            <h2>Intéressé par nos races ?</h2>
+            <p>Commandez vos œufs fertiles, poussins ou reproducteurs dès maintenant.</p>
+            <Link to="/commande" className="btn btn-lime">Passer commande</Link>
           </div>
-          <div className="md:order-1">
-            <h2 className="text-3xl font-display font-bold text-foreground">Brahma</h2>
-            <p className="mt-3 text-muted-foreground">Surnommée le « roi des poulets », la Brahma est une race majestueuse au plumage soyeux et aux pattes emplumées.</p>
-            <ul className="mt-5 space-y-2 text-foreground/80">
-              <li><b>Poids :</b> 5 à 6 kg pour le coq.</li>
-              <li><b>Caractère :</b> docile, idéale en élevage familial.</li>
-              <li><b>Ponte :</b> régulière, même en saison fraîche.</li>
-              <li><b>Esthétique :</b> très prisée en ornement et reproduction.</li>
-            </ul>
-          </div>
-        </article>
+        </div>
       </section>
     </Layout>
   );

@@ -1,50 +1,54 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import trainingImg from "@/assets/training.jpg";
-import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/formation")({
   head: () => ({
     meta: [
-      { title: "Formation Avicole Goliath & Brahma | Elevabio Pointe-Noire" },
-      { name: "description", content: "Formations pratiques en aviculture : démarrage d'élevage, soin des Goliath et Brahma, reproduction et gestion sanitaire." },
-      { property: "og:title", content: "Formation Avicole — Elevabio" },
-      { property: "og:description", content: "Programmes pratiques pour aviculteurs débutants et confirmés." },
+      { title: "Formation avicole — ElevaBio" },
+      { name: "description", content: "Formations pratiques en aviculture Goliath & Brahma à Pointe-Noire." },
     ],
   }),
-  component: Training,
+  component: FormationPage,
 });
 
-function Training() {
-  const modules = [
-    "Démarrer son élevage avicole de A à Z",
-    "Conduite d'élevage Goliath : nutrition, croissance",
-    "Élevage Brahma : reproduction et incubation",
-    "Hygiène, biosécurité et prévention des maladies",
-    "Gestion économique et commercialisation",
-  ];
+function FormationPage() {
   return (
     <Layout>
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        <span className="text-accent font-semibold text-sm uppercase tracking-widest">Formation</span>
-        <h1 className="mt-2 text-4xl md:text-5xl font-display font-bold text-primary">Devenez un aviculteur expert</h1>
-        <p className="mt-4 text-lg text-muted-foreground max-w-2xl">Programmes pratiques animés par les experts Elevabio. Sessions sur site à Pointe-Noire.</p>
+      <section className="page-hero" style={{ marginTop: 24 }}>
+        <span className="eyebrow">Formation</span>
+        <h1>Devenez un aviculteur expert</h1>
+        <p>Programmes pratiques animés par les experts Elevabio. Sessions sur site à Pointe-Noire.</p>
+      </section>
 
-        <div className="mt-10 grid md:grid-cols-2 gap-8 items-start">
-          <img src={trainingImg} alt="Formation Elevabio" className="rounded-3xl shadow-card w-full" />
-          <div className="bg-card rounded-3xl shadow-card p-7">
-            <h2 className="text-2xl font-display font-bold text-foreground">Modules</h2>
-            <ul className="mt-4 space-y-3">
-              {modules.map((m) => (
-                <li key={m} className="flex gap-3 items-start">
-                  <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                  <span className="text-foreground/85">{m}</span>
-                </li>
-              ))}
-            </ul>
-            <Link to="/commande" className="mt-7 inline-flex rounded-full bg-accent text-accent-foreground px-6 py-3 font-semibold">
-              S'inscrire à une formation
-            </Link>
+      <section className="inner-page">
+        <div className="container">
+          <div className="reliability-grid" style={{ marginBottom: 48 }}>
+            <div className="reliability-image">
+              <img src="/img/Formation.jpg" alt="Formation Elevabio" />
+            </div>
+            <div className="reliability-content">
+              <h2>Modules de formation</h2>
+              <p>Des sessions concrètes pour maîtriser l'élevage des races Goliath et Brahma, de l'incubation à la commercialisation.</p>
+            </div>
+          </div>
+
+          <ul className="modules-list">
+            <li>Démarrer son élevage avicole de A à Z</li>
+            <li>Conduite d'élevage Goliath : nutrition, croissance</li>
+            <li>Élevage Brahma : reproduction et incubation</li>
+            <li>Hygiène, biosécurité et prévention des maladies</li>
+            <li>Gestion économique et commercialisation</li>
+          </ul>
+
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <Link to="/commande" search={{ produit: "Formation" } as never} className="btn btn-lime">S'inscrire à une formation</Link>
+          </div>
+
+          <div className="cta-banner">
+            <h2>Une question sur nos formations ?</h2>
+            <p>Consultez la FAQ ou contactez-nous directement.</p>
+            <Link to="/faq" className="btn btn-outline" style={{ marginRight: 12 }}>FAQ</Link>
+            <Link to="/contact" className="btn btn-lime">Nous contacter</Link>
           </div>
         </div>
       </section>
